@@ -2,7 +2,7 @@
 
 #
 # 
-# Copyright (c) 2007-2013, University of California / Singapore Management University
+# Copyright (c) 2007-2018, University of California / Singapore Management University
 #   Lingxiao Jiang         <lxjiang@ucdavis.edu> <lxjiang@smu.edu.sg>
 #   Ghassan Misherghi      <ghassanm@ucdavis.edu>
 #   Zhendong Su            <su@ucdavis.edu>
@@ -52,25 +52,44 @@ if [ $errcode -ne 0 ]; then
 fi
 )
 
+if [ $? -ne 0 ]; then
+	echo "Error: ptgen make failed. Deckard build fails."
+	exit $errcode
+fi
+
 # re-compile vector generator and vector grouping code
 (
 cd ../vgen/treeTra/ || exit 1
+rm -f *.d
 make clean
 make
 errcode=$?
 if [ $errcode -ne 0 ]; then
-	echo "Error: vcgen make failed. Exit."
-	exit 1
-fi
-cd ../vgrouping/ || exit 1
-make clean
-make
-errcode=$?
-if [ $errcode -ne 0 ]; then
-	echo "Error: vgrouping make failed. Exit."
+	echo "Error: vgen/treeTra make failed. Exit."
 	exit $errcode
 fi
 )
+
+if [ $? -ne 0 ]; then
+	echo "Error: vgen/treeTra failed. Deckard build fails."
+	exit $errcode
+fi
+
+(
+cd ../vgen/vgrouping/ || exit 1
+make clean
+make
+errcode=$?
+if [ $errcode -ne 0 ]; then
+	echo "Error: vgen/vgrouping make failed. Exit."
+	exit $errcode
+fi
+)
+
+if [ $? -ne 0 ]; then
+	echo "Error: vgen/vgrouping failed. Deckard build fails."
+	exit $errcode
+fi
 
 # re-compile code for main entries
 make clean
@@ -93,6 +112,11 @@ if [ $errcode -ne 0 ]; then
 fi
 )
 
+if [ $? -ne 0 ]; then
+	echo "Error: lsh make failed. Deckard build fails."
+	exit $errcode
+fi
+
 # re-compile additional library code for trees and graphs
 (
 cd ../lib || exit 1
@@ -105,28 +129,26 @@ if [ $errcode -ne 0 ]; then
 fi
 )
 
-# re-compile .dot parser generator
+if [ $? -ne 0 ]; then
+	echo "Error: lib make failed. Deckard build fails."
+	exit $errcode
+fi
+
+# compile additional tests
 (
-# assume antlr has been run; otherwise, please manually run antlrworks-1.4.3 in the repository first
-cd ../dot2d/grammars/output || exit 1
-make clean
-make
+cd ../ptgen/sol || exit 1
+make test
 errcode=$?
 if [ $errcode -ne 0 ]; then
-	echo "error: dot parser make failed. exit."
+	echo "Error: ptgen/sol 'make test' failed. Exit."
 	exit $errcode
 fi
 )
 
-# re-compile main entries for deckard 2.x
-(
-cd ../dot2d || exit 1
-make clean
-make
-errcode=$?
-if [ $errcode -ne 0 ]; then
-	echo "error: dot2d make failed. exit."
+if [ $? -ne 0 ]; then
+	echo "Error: ptgen/sol 'make test' failed. Deckard may still work."
 	exit $errcode
 fi
-)
+
+echo "Deckard build done. See scripts/clonedetect for sample config, and then run deckard.sh"
 

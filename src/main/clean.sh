@@ -2,7 +2,7 @@
 
 #
 # 
-# Copyright (c) 2007-2013, University of California / Singapore Management University
+# Copyright (c) 2007-2018, University of California / Singapore Management University
 #   Lingxiao Jiang         <lxjiang@ucdavis.edu> <lxjiang@smu.edu.sg>
 #   Ghassan Misherghi      <ghassanm@ucdavis.edu>
 #   Zhendong Su            <su@ucdavis.edu>
@@ -45,6 +45,7 @@ make clean
 
 (
 cd ../vgen/treeTra/ || exit 1
+rm -f *.d
 make clean
 cd ../vgrouping/ || exit 1
 make clean
@@ -55,5 +56,10 @@ make clean
 (
 cd ../lsh/ || exit 1
 make clean_all
+)
+
+(
+cd ../lib || exit 1
+make clean
 )
 

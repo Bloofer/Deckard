@@ -1,6 +1,6 @@
 /*
  * 
- * Copyright (c) 2007-2013, University of California / Singapore Management University
+ * Copyright (c) 2007-2018, University of California / Singapore Management University
  *   Lingxiao Jiang         <lxjiang@ucdavis.edu> <lxjiang@smu.edu.sg>
  *   Ghassan Misherghi      <ghassanm@ucdavis.edu>
  *   Zhendong Su            <su@ucdavis.edu>
@@ -35,8 +35,8 @@
   "class_declaration",		/* recursive */
   "class_body",
   "class_body_declaration",
-  "constructor_declaration",
-  "method_declaration",
+  "constructor_declaration", "generic_constructor_declaration",
+  "method_declaration", "generic_method_declaration",
 // "block_statement", "statement", "statement_nsi", ?? what's the diff between "statement" and "statement_nsi"
 /* consider loops, branches, exceptions */
   "if_then_statement", "if_then_else_statement", "if_then_else_statement_nsi",
@@ -51,5 +51,5 @@
   "interface_declaration",	/* recursive */
   "interface_body",
   "interface_member_declaration",
-  "abstract_method_declaration",
+  "abstract_method_declaration", "generic_abstract_method_declaration",
 NULL

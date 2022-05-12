@@ -1,6 +1,6 @@
 /*
  * 
- * Copyright (c) 2007-2013, University of California / Singapore Management University
+ * Copyright (c) 2007-2018, University of California / Singapore Management University
  *   Lingxiao Jiang         <lxjiang@ucdavis.edu> <lxjiang@smu.edu.sg>
  *   Ghassan Misherghi      <ghassanm@ucdavis.edu>
  *   Zhendong Su            <su@ucdavis.edu>
@@ -249,7 +249,7 @@ Tree* ParseTree::getContextualNode(Tree* node)
 
    Tree* startnode = node->parent;
    while ( startnode!=NULL ) {
-      if ( isContextualNode(startnode) ) { // this condition is language-dependant
+      if ( isContextualNode(startnode) ) { // this condition is language-dependent
          break;
       } else
          startnode = startnode->parent;
@@ -502,6 +502,7 @@ ParseTree* parseFile(const char * fn)
   return pt;
 }
 
+/** identify contextual nodes for clones, so as to look for inconsistencies that may be bugs. TODO: refactor, separate config files for the nodes, separate bug detection from clone detection, better modularization, interface between clone detection and bug detection. */
 static vector<bool> ctxNodes; /* internal use only: ctxNodes[i]==true iff the node kind is considered as contexts */
 static const char * contextualNodes[] = {
 #ifdef JAVA 
@@ -510,7 +511,11 @@ static const char * contextualNodes[] = {
 #ifdef PHP
 #include "../ptgen/php5/phpcontextualNodes.h"
 #else
+#ifdef SOLIDITY
+#include "../ptgen/sol/solcontextualNodes.h"
+#else
 #include "../ptgen/gcc/ccontextualNodes.h"
+#endif
 #endif
 #endif
 };

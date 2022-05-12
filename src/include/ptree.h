@@ -1,6 +1,6 @@
 /*
  * 
- * Copyright (c) 2007-2013, University of California / Singapore Management University
+ * Copyright (c) 2007-2018, University of California / Singapore Management University
  *   Lingxiao Jiang         <lxjiang@ucdavis.edu> <lxjiang@smu.edu.sg>
  *   Ghassan Misherghi      <ghassanm@ucdavis.edu>
  *   Zhendong Su            <su@ucdavis.edu>
@@ -48,6 +48,17 @@
 /** A Tree Node or a tree */
 class Tree;
 
+/** stuff from Ylex & Bison */
+extern FILE *yyin;
+void yyrestart( FILE *new_file );
+int yyparse();
+extern Tree* root;
+
+/** stuff from ptgen */
+void id_init();
+extern std::map<std::string, int> name2id;
+extern std::map<int, std::string> id2name; /*  */
+
 /** A whole parse tree */
 class ParseTree {
    const static int DEBUG_LEVEL = 1;
@@ -67,18 +78,19 @@ class ParseTree {
 
     std::string filename;
 
-    /** relevantNodes, are those that shouold be counted within the vector */
+    /** relevantNodes, are those that should be counted within the vector */
     std::vector<int> relevantNodes;
 
-    /** leafNodes are the smallest nodes which are used to advance the
+    /** leafNodes are the smallest nodes, also named atomicNodes, which are used to advance the
      * sliding window */
     std::vector<int> leafNodes;
 
-    /** validParents are the nodes from which we will generate vectors if they
+    /** validParents, also named parentNodes, are the nodes from which we will generate vectors if they
      * have the required counts */
     std::vector<int> validParents;
 
-    /** this's something similar to relevantNodes??? just because of a different vector merging strategy. */
+    /** this's something similar to a combination of relevantNodes and atomicNodes just because of a different vector merging strategy,
+	 * VectorMergerOnLists??? Not really used. */
     std::vector<int> mergeableNodes;
 
     /** dump the whole tree in a graph-like format; output filename is the 'filename'+'.grp' */ 
@@ -93,7 +105,7 @@ class ParseTree {
 
     /** return the smallest common ancestor in the parse tree that contains all the tokens in the range: */
     Tree* tokenRange2Tree(long startTokenId, long endTokenId); 
-    /** return the "contextual" node above the given node: */
+    /** return the "contextual" node above the given node, i.e., a node that can indicate the type of the surrounding context containing this node: */
     Tree* getContextualNode(Tree* node);
     Tree* getContextualNode(long startTokenId, long endTokenId);
 
@@ -173,7 +185,7 @@ class Tree {
     }
 
     virtual void print() {
-        std::cout << "[ " << type << " ";
+        std::cout << "[ " << getTypeName(id2name,type) << " ";
         for (int i= 0; i < children.size(); i++) {
             children[i]->print();
         }
@@ -248,7 +260,7 @@ class Tree {
 
 class Terminal : public Tree {
 public:
-    Terminal( int type, char *s, int line ) {
+    Terminal( int type, const char *s, int line ) {
         this->type= type;
         value= new std::string(s);
         this->line= line;
@@ -289,18 +301,6 @@ public:
     virtual bool isNonTerminal() {return true;}
     virtual NonTerminal *toNonTerminal() {return this;}
 };
-
-
-/** stuff from Ylex & Bison */
-extern FILE *yyin;
-void yyrestart( FILE *new_file );
-int yyparse();
-extern Tree* root;
-
-/** stuff from ptgen */
-void id_init();
-extern std::map<std::string, int> name2id;
-extern std::map<int, std::string> id2name; /*  */
 
 #endif	/* _PARSE_TREE_H_ */
 
